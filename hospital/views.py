@@ -100,3 +100,36 @@ def shopmedicine(request):
     }
 
     return render(request, 'Medicine.html', context)
+
+@login_required
+def user_profile(request):
+    user = request.user
+    
+    # Get or create the user profile
+    profile, created = Profile.objects.get_or_create(user=user)
+    
+    # Get orders, appointments, and carts related to the profile
+    orders = Order.objects.filter(user=user)
+    # Updated this to use the correct field, probably `patient`
+    appointments = Appointment.objects.filter(patient=user)
+    carts = Cart.objects.filter(user=user)
+
+    context = {
+        'user': user,
+        'profile': profile,
+        'orders': orders,
+        'appointments': appointments,
+        'carts': carts,
+    }
+
+    return render(request, 'Userprofile.html', context)
+    
+def appointments(request):
+    doctors = Doctor.objects.all()
+    hospitals = Hospital.objects.all()
+    context = {
+        'doctors': doctors,
+        'hospitals': hospitals,
+    }
+    return render(request, 'Appointments.html', context)
+

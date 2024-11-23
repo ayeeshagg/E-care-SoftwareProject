@@ -35,3 +35,17 @@ class Medicine(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='carts')
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        return self.medicine.price * self.quantity  # Calculate price based on quantity
+
+    def __str__(self):
+        return f"{self.user.username} - {self.medicine.name}"
+       
