@@ -64,3 +64,22 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.total}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.order.user.username} - {self.medicine.name}"
+
+
+
+class Doctor(models.Model):
+    name = models.CharField(max_length=255)
+    specialty = models.CharField(max_length=255)
+    qualifications = models.TextField()
+    image = models.ImageField(upload_to='doctors/')
+    
+    def __str__(self):
+        return self.name
