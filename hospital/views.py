@@ -123,7 +123,7 @@ def user_profile(request):
     }
 
     return render(request, 'Userprofile.html', context)
-    
+
 def appointments(request):
     doctors = Doctor.objects.all()
     hospitals = Hospital.objects.all()
@@ -133,3 +133,31 @@ def appointments(request):
     }
     return render(request, 'Appointments.html', context)
 
+# Doctor details and schedule view
+def doctor_details(request, doctor_id):
+    doctor = get_object_or_404(Doctor, id=doctor_id)
+    schedules = Schedule.objects.filter(doctor=doctor).order_by('hospital')
+
+    context = {
+        'doctor': doctor,
+        'schedules': schedules,
+    }
+    return render(request, 'doctor_details.html', context)
+
+# Appointment confirmation view
+@login_required(login_url='login')
+def appointment_confirmation(request, appointment_id):
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+    return render(request, 'appointment_confirmation.html', {'appointment': appointment})
+
+
+def hospital_details(request, hospital_id):
+    hospital = get_object_or_404(Hospital, id=hospital_id)
+    doctors = hospital.schedules.values('doctor').distinct()
+    doctor_list = Doctor.objects.filter(id__in=[d['doctor'] for d in doctors])
+    
+    context = {
+        'hospital': hospital,
+        'doctors': doctor_list,  # Pass the doctors related to the hospital
+    }
+    return render(request, 'hospital_details.html', context)
