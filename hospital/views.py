@@ -161,3 +161,61 @@ def hospital_details(request, hospital_id):
         'doctors': doctor_list,  # Pass the doctors related to the hospital
     }
     return render(request, 'hospital_details.html', context)
+
+@login_required(login_url='login')
+def cart(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+
+    total_price = sum([item.total_price() for item in cart_items])  # Calculate total price of all cart items
+
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+    return render(request, 'cart.html', context)
+
+
+@login_required(login_url='login')
+def add_to_cart(request, medicine_id):
+    user = request.user
+    medicine = get_object_or_404(Medicine, id=medicine_id)
+
+    # Check if cart item already exists for the user and medicine
+    cart_item, created = Cart.objects.get_or_create(user=user, medicine=medicine)
+    
+    if not created:  # If it already exists, increase the quantity
+        cart_item.quantity += 1
+        cart_item.save()
+
+    return redirect('cart')
+   
+@login_required
+def remove_from_cart(request, cart_item_id):
+    cart_item = get_object_or_404(Cart, id=cart_item_id)
+    cart_item.delete()
+    return redirect('cart')
+
+@login_required
+def clear_cart(request):
+    user = request.user
+    Cart.objects.filter(user=user).delete()  # Delete all cart items for the user
+    return redirect('cart')
+
+@login_required
+def increase_quantity(request, cart_item_id):
+    cart_item = get_object_or_404(Cart, id=cart_item_id)
+    cart_item.quantity += 1
+    cart_item.save()
+    return redirect('cart')
+
+@login_required
+def decrease_quantity(request, cart_item_id):
+    cart_item = get_object_or_404(Cart, id=cart_item_id)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()  # Remove item if quantity reaches 0
+    return redirect('cart')
+
