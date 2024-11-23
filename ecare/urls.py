@@ -29,5 +29,10 @@ urlpatterns = [
     path('logout/', logout, name='logout'),
     path('shopmedicine/', shopmedicine, name='shopmedicine'),
     path('medicine_details/<int:medicine_id>/', medicine_details, name='medicine_details'),
+    path('appointments/', appointments, name='appointments'),
+    path('doctor/<int:doctor_id>/', doctor_details, name='doctor_details'),
+    path('book_appointment/<int:schedule_id>/', book_appointment, name='book_appointment'),
+    path('appointment_confirmation/<int:appointment_id>/', appointment_confirmation, name='appointment_confirmation'),
+    path('hospital_details/<int:hospital_id>/', hospital_details, name='hospital_details'),
 
 ]
