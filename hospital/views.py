@@ -219,3 +219,38 @@ def decrease_quantity(request, cart_item_id):
         cart_item.delete()  # Remove item if quantity reaches 0
     return redirect('cart')
 
+# Booking logic
+@login_required(login_url='login')
+def book_appointment(request, schedule_id):
+    schedule = get_object_or_404(Schedule, id=schedule_id)
+    doctor = schedule.doctor
+    hospital = schedule.hospital
+
+    if request.method == "POST":
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        contact = request.POST.get('contact')
+
+        # Check if this doctor is already booked at the selected date and time
+        if Appointment.objects.filter(doctor=doctor, date=date, time=time).exists():
+            return HttpResponse("This time is already booked for the selected doctor.")
+
+        # Create the appointment
+        appointment = Appointment.objects.create(
+            patient=request.user,
+            doctor=doctor,
+            hospital=hospital,
+            schedule=schedule,
+            patient_contact=contact,
+            date=date,
+            time=time,
+            status='pending'
+        )
+
+        return redirect('appointment_confirmation', appointment_id=appointment.id)
+
+    context = {
+        'doctor': doctor,
+        'schedule': schedule
+    }
+    return render(request, 'book_appointment.html', context)
