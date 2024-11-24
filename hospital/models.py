@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+import uuid
 
 # Create your models here.
 
@@ -114,3 +116,26 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+        
+class Appointment (models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments')
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
+    hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='appointments')
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='appointments')
+    patient_contact = models.CharField(max_length=20)
+    date = models.DateField()
+    time = models.TimeField()
+    
+    STATUS_CHOICES = [
+    ('pending', 'Pending'),
+    ('confirmed', 'Confirmed'),
+    ('cancelled', 'Cancelled')
+    ]
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+   
+    def __str__(self):
+        return f"{self.patient.username} - {self.doctor.name} at {self.hospital.name}"
+
