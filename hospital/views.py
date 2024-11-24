@@ -9,6 +9,8 @@ from django.contrib.auth import logout as django_logout
 from django.contrib.auth.decorators import login_required
 from urllib.parse import unquote, quote
 from .models import *
+import random
+import string
 
 # Create your views here.
 def home(request):
@@ -309,3 +311,5 @@ def checkout(request):
         'total_price': total_price,
     }
     return render(request, 'checkout.html', context)
+
+
