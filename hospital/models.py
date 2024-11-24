@@ -105,3 +105,12 @@ class Schedule(models.Model):
 
     def __str__(self):
         return f"{self.doctor.name} at {self.hospital.name}"
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='profiles/', default='profiles/default.png')
+
+    def __str__(self):
+        return self.user.username
