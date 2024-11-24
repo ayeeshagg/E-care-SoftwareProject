@@ -254,3 +254,24 @@ def book_appointment(request, schedule_id):
         'schedule': schedule
     }
     return render(request, 'book_appointment.html', context)
+
+
+@login_required
+def order_confirmation(request, order_id):
+    order = get_object_or_404(Order, user=request.user, id=order_id)
+
+    context = {
+        'order': order,
+    }
+    return render(request, 'order_confirmation.html', context)
+
+
+@login_required(login_url='login')
+def manage_orders(request):
+    user = request.user
+    orders = Order.objects.filter(user=user).order_by('-ordered_at')  # Get user's orders
+
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'manage_orders.html', context)
