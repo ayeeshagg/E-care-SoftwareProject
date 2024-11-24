@@ -275,3 +275,37 @@ def manage_orders(request):
         'orders': orders,
     }
     return render(request, 'manage_orders.html', context)
+
+
+@login_required(login_url='login')
+def checkout(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    total_price = sum([item.total_price() for item in cart_items])  # Calculate total price
+
+    if request.method == 'POST':
+        contact_number = request.POST['contact_number']
+        address = request.POST['address']
+
+        # Create a new order
+        order = Order.objects.create(
+            user=user,
+            total=total_price,
+            status='pending'
+        )
+
+        # Add cart items to order
+        for item in cart_items:
+            OrderItem.objects.create(order=order, medicine=item.medicine, quantity=item.quantity)
+
+        # Clear the cart
+        cart_items.delete()
+
+        # Redirect to order confirmation page using order ID
+        return redirect('order_confirmation', order_id=order.id)
+
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+    return render(request, 'checkout.html', context)
