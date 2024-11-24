@@ -83,3 +83,25 @@ class Doctor(models.Model):
     
     def __str__(self):
         return self.name
+
+class Hospital(models.Model):
+    doctor = models.ManyToManyField(Doctor, related_name='hospitals')
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    logo = models.ImageField(upload_to='hospitals/')
+
+    def __str__(self):
+        return self.name
+    
+class Schedule(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='schedules')
+    hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE, related_name='schedules')
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    days_available = models.CharField(max_length=255) 
+    fee = models.DecimalField(max_digits=10, decimal_places=2)
+    pay_first = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.doctor.name} at {self.hospital.name}"
